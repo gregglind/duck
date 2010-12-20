@@ -1,6 +1,10 @@
-
+#!/usr/bin/env python
 
 '''
+JSON Validator, designed to be easy to use, even at the cost of generality.
+If you want 'can handle anything' got to json schema or xsd or such!
+If you want 'can handle most things, and it's not that hard to set up',
+come here!
 
 '''
 

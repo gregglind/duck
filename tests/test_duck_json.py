@@ -37,6 +37,16 @@ answers = [
         dict(a=1,b=dict(c=1,d=[],e=None), __duck={} ),
         dict(a=1,b=dict(c=1,d=[],e=None)),
         False,{'meta':None}),
+
+    ## callables / validators
+    ('int validator good',
+        dict(a=int),
+        dict(a=1),
+        True,{}),
+    ('int validator good',
+        dict(a=int),
+        dict(a='a'),
+        False,{}),
 ]
 
 

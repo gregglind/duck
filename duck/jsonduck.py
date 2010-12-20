@@ -91,6 +91,11 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger):
         data:  the 'to be compared'
         meta:  the name of the key/attribute where 'meta' info, like
             options, etc. are in the model
+
+    Notes:
+    [1] validation... if the 'type' if 'function like', we try the function
+        on the data.  Unless it raises, we view this as 'valid'
+    [2] 
     '''
     rargs = dict(meta=meta,strict=strict,version=version,logger=logger)
     def same_typish(thing1,thing2):
@@ -136,6 +141,18 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger):
             print 'm is list, d isnt, false'
             return False
     
+    # I think 'callable' is close to right here,
+    # since json doesn't like callables as data
+    # this will be different in python / guarding
+    # TODO, revisit.
+    elif callable(model):
+        print 'callable'
+        try:
+            model(data)
+        except Exception, exc:
+            print 'invalid', exc
+            return False
+        return True
     else:
         print 'not list or dict', model, data
         return True

@@ -17,6 +17,7 @@ class FakeLogger(object):
 
 fakeLogger=FakeLogger()
 
+function_type = type(lambda x:x)
 
 def typish(thing):
     '''

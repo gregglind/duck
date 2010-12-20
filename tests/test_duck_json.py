@@ -23,6 +23,20 @@ answers = [
         dict(a=1,b=dict(c=1,d=[],e=None)),
         dict(a=1,b=dict(c=1,d=[],e=None,f=1), c=True),
         False,{'strict': True},),
+
+    # meta should be ignored
+    ('ignore the meta dict',
+        dict(a=1,b=dict(c=1,d=[],e=None), __duck={} ),
+        dict(a=1,b=dict(c=1,d=[],e=None)),
+        True,{}),
+    ('ignore the meta dict (not called meta!)',
+        dict(a=1,b=dict(c=1,d=[],e=None),OPTS={}),
+        dict(a=1,b=dict(c=1,d=[],e=None)),
+        True,{'meta':'OPTS'}),
+    ('if no meta set, obviously the cmp should fail',
+        dict(a=1,b=dict(c=1,d=[],e=None), __duck={} ),
+        dict(a=1,b=dict(c=1,d=[],e=None)),
+        False,{'meta':None}),
 ]
 
 

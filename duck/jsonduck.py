@@ -105,6 +105,10 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger):
             return False
     
         k1,k2 = set(model.keys()), set(data.keys())
+        if meta is not None:
+            if meta in k1:
+                theseopts = model[meta]
+                k1.remove(meta)
         if strict:
             if k1 != k2:
                 return False

@@ -80,10 +80,12 @@ future:
 
 '''
 
+
 class QuackError(Exception): pass
 
 # version 0.0, assume it's all dicts everywhere....
-def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger):
+def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger,
+    special='___'):
     ''' is the data 'same enough' as the model?
     
     Args:
@@ -91,11 +93,15 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger):
         data:  the 'to be compared'
         meta:  the name of the key/attribute where 'meta' info, like
             options, etc. are in the model
+        special:  if not None, anything prefixed with this will be treated
+            as a 'special', invoking the (tbd?) minilang.  
 
     Notes:
     [1] validation... if the 'type' if 'function like', we try the function
         on the data.  Unless it raises, we view this as 'valid'
-    [2] 
+    [2] specials... maybe a django like minilang?  ___between_0_10?
+            ___length_5_10 ?
+        3 undescores...hideous, but at least it is configurable hideousness.
     '''
     rargs = dict(meta=meta,strict=strict,version=version,logger=logger)
     def same_typish(thing1,thing2):
@@ -108,6 +114,23 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger):
     # {(dict,dict):  recurse...
     # {(list,str}):  False...}
     # tbd!
+
+    # check for specials... v.0!
+    # yes, lots of strong assumptions here!
+    def check_special(thing, special=special):
+        try:
+            thing.startswith(special)
+            cmd = thing.lstrip(special)
+            # get special, for now, nothing!
+            return _nothing
+        except Exception, exc:
+            return None
+
+    _spec = check_special(model,special)
+    if _spec:
+        model = _spec
+    
+    ## normal handling...
 
     # both dicts, recurse
     if mtype is dict:
@@ -140,7 +163,7 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger):
         else:
             print 'm is list, d isnt, false'
             return False
-    
+
     # I think 'callable' is close to right here,
     # since json doesn't like callables as data
     # this will be different in python / guarding
@@ -153,6 +176,7 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger):
             print 'invalid', exc
             return False
         return True
+
     else:
         print 'not list or dict', model, data
         return True

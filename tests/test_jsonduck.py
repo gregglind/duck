@@ -54,8 +54,7 @@ answers = [
         dict(a=1),
         True,{}),
 
-
-    ('specials, existing function',
+    ('specials, eval python function',
         dict(a='___str'),
         dict(a='bcd'),
         True,{}),

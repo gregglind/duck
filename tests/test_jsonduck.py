@@ -47,6 +47,18 @@ answers = [
         dict(a=int),
         dict(a='a'),
         False,{}),
+
+    ## note that specials don't really do much yet
+    ('specials, version 0',
+        dict(a='___lt_5'),
+        dict(a=1),
+        True,{}),
+
+
+    ('specials, existing function',
+        dict(a='___str'),
+        dict(a='bcd'),
+        True,{}),
 ]
 
 

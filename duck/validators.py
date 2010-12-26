@@ -33,17 +33,28 @@ regexen = [
 
 
 def parse_validator(string,regexen=regexen,eval_=True):
-    '''
+    ''' convert a string into a validator, if possible.
+
     Args:
-        string:
-        regexen=list of tuples of ('regex',function_factory, [name])
+        string:  the string to be parsed
+
+        regexen:list of tuples of ('regex',function_factory, [name])
+
+        eval_:  should 'eval' be used to try to guess the function name?
+    
     
     Notes:
-    [1] implicit is that
+    
+    1. implicit is that
         * the facacde for each factory is all kwargs
         * the function returned
             - takes a single positional value
-            - raises for all invalids
+            - raises for all invalid values
+
+    >>> parse_validator('int').__name__
+    'int'
+    >>> assert parse_validator('int', [], eval_=False) is None
+
     '''
     if eval_:
         try:

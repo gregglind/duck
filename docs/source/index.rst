@@ -8,10 +8,10 @@ Welcome to Duck's documentation!
 
 Contents:
 
-.. toctree::
-   :maxdepth: 2
+..  toctree::
+    :maxdepth: 2
 
-   duck.rst
+    duck.rst
 
 Indices and tables
 ==================
@@ -19,4 +19,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

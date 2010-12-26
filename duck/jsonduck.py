@@ -90,18 +90,28 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger,
     
     Args:
         model:  the 'reference' structure
+        
         data:  the 'to be compared'
+
         meta:  the name of the key/attribute where 'meta' info, like
             options, etc. are in the model
+
         special:  if not None, anything prefixed with this will be treated
             as a 'special', invoking the (tbd?) minilang.  
 
     Notes:
-    [1] validation... if the 'type' if 'function like', we try the function
+
+    1.  validation... if the 'type' if 'function like', we try the function
         on the data.  Unless it raises, we view this as 'valid'
-    [2] specials... maybe a django like minilang?  ___between_0_10?
-            ___length_5_10 ?
-        3 undescores...hideous, but at least it is configurable hideousness.
+    2.  specials... maybe a django like minilang?  ___between_0_10?
+        ___length_5_10 ?   (basic implementation is in ``validators``.)
+        Three (3) undescores is hideous, but at least it is configurable hideousness.
+
+    >>> model = {'a': 1, 'b': []}
+    >>> data = {'a': 13, 'b': [1,2,3,4,5], 'c':True}
+    >>> data_bad = {'d':1}
+    >>> assert quack(model,data)
+    >>> assert not quack(model,data_bad)
     '''
     rargs = dict(meta=meta,strict=strict,version=version,logger=logger)
     def same_typish(thing1,thing2):
@@ -152,16 +162,16 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger,
         if k1 <= k2:
             return all((quack(model[k],data[k],**rargs) for k in k1))
         else:
-            print k1,k2,'false'
+            #print k1,k2,'false'
             return False
     
     # both lists - good enough!
     elif mtype is list:
         if dtype is list:
-            print 'both lists, true'
+            #print 'both lists, true'
             return True
         else:
-            print 'm is list, d isnt, false'
+            #print 'm is list, d isnt, false'
             return False
 
     # I think 'callable' is close to right here,
@@ -169,16 +179,16 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger,
     # this will be different in python / guarding
     # TODO, revisit.
     elif callable(model):
-        print 'callable'
+        #print 'callable'
         try:
             model(data)
         except Exception, exc:
-            print 'invalid', exc
+            #print 'invalid', exc
             return False
         return True
 
     else:
-        print 'not list or dict', model, data
+        #print 'not list or dict', model, data
         return True
 
 

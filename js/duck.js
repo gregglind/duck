@@ -13,7 +13,7 @@ hasOwn = Object.prototype.hasOwnProperty;
 
 duck = (function(){
     // cf:  jquery class2type?
-    typeish = function(thing){
+    typish = function(thing){
         if (Array.isArray(thing)) {
             return 'array';
         } else {
@@ -26,7 +26,7 @@ duck = (function(){
         meta: '__duck',
         strict: false,
         version: 1,
-        logger: '',
+        logger: console,
         special: '___'
     };
 
@@ -38,10 +38,18 @@ duck = (function(){
         var mytype;
         var dtype;
         var name;
-        
+        var logger;
+    
+        logger = options.logger;
+
         mtype = typish(model);
         dtype = typish(data);
 
+        logger.log(mtype);
+        logger.log(model);
+        logger.log(dtype)
+        logger.log(data);
+        
         if (mtype === 'string') {
             // does it start with the special string?
             if (model.indexOf(options.special) == 0) {
@@ -52,27 +60,28 @@ duck = (function(){
             }
         }
 
-        if (mtype === 'array') {
-            if (dtype === 'array') {
+        if ((mtype === 'array') || (dtype === 'array')) {
+            if (mytype === dtype) {
                 return true;
             } else {
                 return false;
             }
-        } else if (mtype === 'object') {
+        } else if (mtype === 'object' || dtype==='object') {
             // loop over the keys
-            if (dtype !== 'object') {
+            if (mtype !== dtype) {
                 return false;
-            } else {
-                // we need to add on strictness and whatnot here.
-                // return all((quack(model[k],data[k],**rargs) for k in k1))
-                for ( name in model ) {
-                    if (! name in data) {
-                        return false;
-                    }
-                    if (! quack(model[name],data[name],options)) {
-                        return false;
-                    }
+            }
+            // we need to add on strictness and whatnot here.
+            // return all((quack(model[k],data[k],**rargs) for k in k1))
+            for ( name in model ) {
+                if (!(name in data)) {
+                    logger.log(name);
+                    return false;
                 }
+                if (! quack(model[name],data[name],options)) {
+                    return false;
+                }
+            return true;
             }
         } else if (mtype === 'function') {
             // call it on the data, what should happen here, given

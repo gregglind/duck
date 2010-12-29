@@ -1,3 +1,8 @@
+/*
+This file is part of the Duck package
+*/
+
+// for javascripts without Array.isArray 
 if (typeof Array.isArray === "undefined") {
     Array.isArray = function (arg) {
         return Object.prototype.toString.call(arg) === "[object Array]";
@@ -5,15 +10,45 @@ if (typeof Array.isArray === "undefined") {
 }
 
 
+// for javascripts without Consoles.  
+if (typeof(console) === 'undefined') {
+    console = {
+        log: function(){} // does nothing, unless there is a console
+    };
+}
+
+
 // [[],{},'a',function(){},true].map(function(x){return typeof(x);})
 // ["object", "object", "string", "function", "boolean"]
 
-hasOwn = Object.prototype.hasOwnProperty;
-
 
 duck = (function(){
+    var hasOwn = Object.prototype.hasOwnProperty;
+
+    var utils = {
+        'defaultify': function(defaults,got,strict){
+                if (got === undefined) { got = {}; };
+                strict = Boolean(strict);  // defaults to false
+                var out = {};
+                for (key in defaults){
+                    if (hasOwn.call(defaults,key)) { out[key] = defaults[key];}
+                    if (key in got) { out[key] = got[key];}
+                };
+                if (! strict) {
+                    for (key in got){
+                        if (hasOwn.call(got,key)) { out[key] = got[key];}
+                    };
+                };
+                return (out);
+            }
+    };
+    
+    var fakelogger = {
+        log: function(){} // does nothing, unless there is a console
+    };
+
     // cf:  jquery class2type?
-    typish = function(thing){
+    var typish = function(thing){
         if (Array.isArray(thing)) {
             return 'array';
         } else {
@@ -21,8 +56,17 @@ duck = (function(){
         }
     };
 
+    // compatibility (i.e., laziness!) with python
+    // todo:  maybe add ruby or other ones, as applicable!
+    var validators = {
+        'int':  Number,
+        'float':  Number,
+        'str':  String,
+        'dict':  Object,
+        'list':  Array
+    };
 
-    quack_defaults = {
+    var quack_defaults = {
         meta: '__duck',
         strict: false,
         version: 1,
@@ -30,11 +74,16 @@ duck = (function(){
         special: '___'
     };
 
-    quack = function(model,data,options){
-        if (options === undefined) {
-            options = quack_defaults;
+    var parse_validator = function(string) {
+        if (string in validators) {
+            return validators[string];
+        } else {
+            return eval(string);
         }
-        
+    };
+
+    var quack = function(model,data,options){
+        options = utils.defaultify(quack_defaults,options);
         var mytype;
         var dtype;
         var name;
@@ -55,7 +104,9 @@ duck = (function(){
             if (model.indexOf(options.special) == 0) {
                 // an 'always true
                 // eventually need a 'eval(model.slice(options.special.length)))' bit
-                model = function(){ return true; };
+                var newstring = model.slice(options.special.length);
+                logger.log("newstring: " + newstring);
+                model = parse_validator(newstring);
                 mtype = typish(model);  // function!
             }
         }
@@ -86,7 +137,8 @@ duck = (function(){
         } else if (mtype === 'function') {
             // call it on the data, what should happen here, given
             // js exceptions and the like!
-            mtype(data);
+            logger.log('function!')
+            model(data);
             return true;
         }  else {
             return true;
@@ -95,9 +147,12 @@ duck = (function(){
     };
 
     return {
+        'utils':  utils,
         'quack':  quack,
         'quack_defaults': quack_defaults,
-        'typish':  typish
+        'typish':  typish,
+        'validators': validators,
+        'parse_validator':  parse_validator
     };
 }());
 

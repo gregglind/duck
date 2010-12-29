@@ -1,3 +1,10 @@
+# Duck Javascript Library
+# https://github.com/gregglind/duck
+# 
+# Copyright 2010, Gregg Lind
+# Dual licensed under the MIT or GPL Version 2 licenses.
+# 
+
 """use get_logger:
 from duck_loggin import get_logger; logger = get_logger(__name__)
 # then you can:

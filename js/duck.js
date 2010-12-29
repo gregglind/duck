@@ -1,6 +1,11 @@
-/*
-This file is part of the Duck package
-*/
+/*!
+ * Duck Javascript Library
+ * https://github.com/gregglind/duck
+ *
+ * Copyright 2010, Gregg Lind
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ *
+ */
 
 /*global console: false */
 

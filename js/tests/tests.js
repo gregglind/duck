@@ -1,3 +1,12 @@
+/*!
+ * Duck Javascript Library
+ * https://github.com/gregglind/duck
+ *
+ * Copyright 2010, Gregg Lind
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ *
+ */
+
 (function () {
     var all_test_files, x;
     

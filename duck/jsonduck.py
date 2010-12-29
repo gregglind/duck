@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 
+# Duck Javascript Library
+# https://github.com/gregglind/duck
+# 
+# Copyright 2010, Gregg Lind
+# Dual licensed under the MIT or GPL Version 2 licenses.
+# 
+
+
 '''
 JSON Validator, designed to be easy to use, even at the cost of generality.
 If you want 'can handle anything' got to json schema or xsd or such!

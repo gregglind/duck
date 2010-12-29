@@ -2,6 +2,9 @@
 This file is part of the Duck package
 */
 
+/*global console: false */
+
+
 // for javascripts without Array.isArray 
 if (typeof Array.isArray === "undefined") {
     Array.isArray = function (arg) {
@@ -13,7 +16,7 @@ if (typeof Array.isArray === "undefined") {
 // for javascripts without Consoles.  
 if (typeof(console) === 'undefined') {
     console = {
-        log: function(){} // does nothing, unless there is a console
+        log: function () {} // does nothing, unless there is a console
     };
 }
 
@@ -22,33 +25,45 @@ if (typeof(console) === 'undefined') {
 // ["object", "object", "string", "function", "boolean"]
 
 
-duck = (function(){
-    var hasOwn = Object.prototype.hasOwnProperty;
+var duck = (function () {
+    var hasOwn, utils, fakelogger, quack, parse_validator,
+        quack_defaults, typish, validators;
+    
+    hasOwn = Object.prototype.hasOwnProperty;
 
-    var utils = {
-        'defaultify': function(defaults,got,strict){
-                if (got === undefined) { got = {}; };
+    utils = {
+        'defaultify': function (defaults, got, strict) {
+                var key, out;
+                if (got === undefined) {
+                    got = {};
+                }
                 strict = Boolean(strict);  // defaults to false
-                var out = {};
-                for (key in defaults){
-                    if (hasOwn.call(defaults,key)) { out[key] = defaults[key];}
-                    if (key in got) { out[key] = got[key];}
-                };
+                out = {};
+                for (key in defaults) {
+                    if (hasOwn.call(defaults, key)) {
+                        out[key] = defaults[key];
+                        if (key in got) {
+                            out[key] = got[key];
+                        }
+                    }
+                }
                 if (! strict) {
-                    for (key in got){
-                        if (hasOwn.call(got,key)) { out[key] = got[key];}
-                    };
-                };
+                    for (key in got) {
+                        if (hasOwn.call(got, key)) {
+                            out[key] = got[key];
+                        }
+                    }
+                }
                 return (out);
             }
     };
     
-    var fakelogger = {
-        log: function(){} // does nothing, unless there is a console
+    fakeLogger = {
+        log: function () {} // does nothing, unless there is a console
     };
 
     // cf:  jquery class2type?
-    var typish = function(thing){
+    typish = function (thing) {
         if (Array.isArray(thing)) {
             return 'array';
         } else {
@@ -58,7 +73,7 @@ duck = (function(){
 
     // compatibility (i.e., laziness!) with python
     // todo:  maybe add ruby or other ones, as applicable!
-    var validators = {
+    validators = {
         'int':  Number,
         'float':  Number,
         'str':  String,
@@ -66,7 +81,7 @@ duck = (function(){
         'list':  Array
     };
 
-    var quack_defaults = {
+    quack_defaults = {
         meta: '__duck',
         strict: false,
         version: 1,
@@ -74,7 +89,7 @@ duck = (function(){
         special: '___'
     };
 
-    var parse_validator = function(string) {
+    parse_validator = function (string) {
         if (string in validators) {
             return validators[string];
         } else {
@@ -82,12 +97,9 @@ duck = (function(){
         }
     };
 
-    var quack = function(model,data,options){
-        options = utils.defaultify(quack_defaults,options);
-        var mytype;
-        var dtype;
-        var name;
-        var logger;
+    quack = function (model, data, options) {
+        options = utils.defaultify(quack_defaults, options);
+        var mtype, dtype, name, logger, newstring;
     
         logger = options.logger;
 
@@ -96,48 +108,59 @@ duck = (function(){
 
         logger.log(mtype);
         logger.log(model);
-        logger.log(dtype)
+        logger.log(dtype);
         logger.log(data);
         
         if (mtype === 'string') {
             // does it start with the special string?
-            if (model.indexOf(options.special) == 0) {
+            if (model.indexOf(options.special) === 0) {
                 // an 'always true
                 // eventually need a 'eval(model.slice(options.special.length)))' bit
-                var newstring = model.slice(options.special.length);
+                newstring = model.slice(options.special.length);
                 logger.log("newstring: " + newstring);
                 model = parse_validator(newstring);
                 mtype = typish(model);  // function!
             }
         }
 
-        if ((mtype === 'array') || (dtype === 'array')) {
-            if (mytype === dtype) {
+        if (mtype === 'array' || dtype === 'array') {
+            if (mtype === dtype) {
                 return true;
             } else {
                 return false;
             }
-        } else if (mtype === 'object' || dtype==='object') {
+        
+        } else if (mtype === 'object' || dtype === 'object') {
             // loop over the keys
             if (mtype !== dtype) {
                 return false;
             }
             // we need to add on strictness and whatnot here.
             // return all((quack(model[k],data[k],**rargs) for k in k1))
-            for ( name in model ) {
-                if (!(name in data)) {
-                    logger.log(name);
-                    return false;
+            for (name in model) {
+                if (hasOwn.call(model, name) && name !== options.meta) {
+                    if (!(name in data)) {
+                        logger.log(name);
+                        return false;
+                    }
+                    if (! quack(model[name], data[name], options)) {
+                        return false;
+                    }
                 }
-                if (! quack(model[name],data[name],options)) {
-                    return false;
-                }
-            return true;
             }
+            if (options.strict) {
+                for (name in data) {
+                    if (hasOwn.call(data, name) && (!(name in model))) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        
         } else if (mtype === 'function') {
             // call it on the data, what should happen here, given
             // js exceptions and the like!
-            logger.log('function!')
+            logger.log('function!');
             model(data);
             return true;
         }  else {
@@ -147,6 +170,7 @@ duck = (function(){
     };
 
     return {
+        'fakeLogger': fakeLogger,
         'utils':  utils,
         'quack':  quack,
         'quack_defaults': quack_defaults,

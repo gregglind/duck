@@ -24,6 +24,25 @@ answers = [
         dict(a=1,b=dict(c=1,d=[],e=None,f=1), c=True),
         False,{'strict': True},),
 
+    ('model is int, data is dict, should fail',
+        1,
+        dict(),
+        False,{}
+    ),
+
+    ('model is int, data is list, should fail',
+        1,
+        [],
+        False,{}
+    ),
+
+    ('two empty dicts',
+        {},
+        {},
+        True,{}
+    ),
+
+
     # meta should be ignored
     ('ignore the meta dict',
         dict(a=1,b=dict(c=1,d=[],e=None), __duck={} ),

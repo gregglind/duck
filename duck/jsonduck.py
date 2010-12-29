@@ -143,10 +143,10 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger,
     ## normal handling...
 
     # both dicts, recurse
-    if mtype is dict:
-        if dtype is not dict:
+    if mtype is dict or dtype is dict:
+        if not (mtype,dtype) == (dict,dict):
             return False
-    
+        
         k1,k2 = set(model.keys()), set(data.keys())
         if meta is not None:
             if meta in k1:
@@ -166,13 +166,12 @@ def quack(model,data,meta='__duck',strict=False,version=1,logger=fakeLogger,
             return False
     
     # both lists - good enough!
-    elif mtype is list:
-        if dtype is list:
-            #print 'both lists, true'
-            return True
-        else:
-            #print 'm is list, d isnt, false'
+    elif mtype is list or dtype is list:
+        if (mtype,dtype) != (list,list):
             return False
+        
+        # any other list verification we want to do goes here.
+        return True
 
     # I think 'callable' is close to right here,
     # since json doesn't like callables as data

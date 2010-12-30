@@ -5,7 +5,7 @@ About Duck
 
 Ever find yourself writing code like this?
 
-.. sourcecode:: python
+::
 
     if 'xycoords' in mydata.getdefault('payload',dict()):
         api_version = 1.3
